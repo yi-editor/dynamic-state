@@ -2,6 +2,7 @@
 {-# LANGUAGE ExistentialQuantification #-}
 {-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE TupleSections #-}
+{-# LANGUAGE CPP #-}
 {-# OPTIONS_HADDOCK show-extensions #-}
 
 -- |
@@ -41,8 +42,11 @@ data Dynamic
 -- | Try to extract a value from the 'Dynamic', returning True if it was decoded from a 'Serial'
 fromDynamic :: forall a. (Typeable a, Binary a) => Dynamic -> Maybe (a,Bool)
 fromDynamic (Dynamic b) = (,False) <$> cast b
+#if __GLASGOW_HASKELL__ < 708
+fromDynamic (Serial bs) = (Just $ decode bs,True)
+#else
 fromDynamic (Serial bs) = let b = either (const Nothing) (\(_,_,a) -> Just a) $ decodeOrFail bs in (,True) <$> b
-
+#endif
 
 instance Binary Dynamic where
   put = put . toSerialRep where
