@@ -1,8 +1,8 @@
 name:                dynamic-state
-version:             0.1.0.2
+version:             0.1.0.3
 synopsis:            Optionally serializable dynamic state keyed by type
 description:         Optionally serializable dynamic state keyed by type
-license:             BSD3
+license:             GPL-2
 license-file:        LICENSE
 author:              Carter Charbonneau
 maintainer:          zcarterc@gmail.com

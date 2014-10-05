@@ -6,7 +6,7 @@
 
 -- |
 -- Module      :  Data.DynamicState.Serializable
--- License     :  BSD3
+-- License     :  GPL2
 -- Maintainer  :  zcarterc@gmail.com
 -- Stability   :  experimental
 -- Portability :  portable
