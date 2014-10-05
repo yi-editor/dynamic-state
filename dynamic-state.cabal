@@ -11,7 +11,7 @@ build-type:          Simple
 cabal-version:       >=1.10
 
 library
-  ghc-options:      -Wall -Werror
+  ghc-options:      -Wall 
 
   exposed-modules:
     Data.DynamicState
