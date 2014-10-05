@@ -61,10 +61,10 @@ instance Monoid DynamicState where
 -- | Get a value, inside a State-like monad specified by the first two functions
 getDyn :: forall m a. (Typeable a, Binary a, Monad m) => m DynamicState -> (DynamicState -> m ()) -> m (Maybe a)
 getDyn get' put' = do
-    let ty = (cTypeOf (undefined::a))
+    let ty = cTypeOf (undefined::a)
     dvs <- liftM unDynamicState get'
     case M.lookup ty dvs >>= fromDynamic of
-      Just (val,new) -> (when new $ put' $ DynamicState $ M.insert ty (Dynamic val) dvs) >> return val
+      Just (val,new) -> (when new $ put' $ DynamicState $ M.insert ty (Dynamic val) dvs) >> return (Just val)
       Nothing -> return Nothing
 -- | Set a value, inside a State-like monad specified by the first two functions
 putDyn :: forall m a. (Typeable a, Binary a, Monad m) => m DynamicState -> (DynamicState -> m ()) -> a -> m ()
