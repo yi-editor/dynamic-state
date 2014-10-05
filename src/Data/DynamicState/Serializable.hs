@@ -25,7 +25,6 @@ module Data.DynamicState.Serializable (
   ) where
 
 import Data.Binary
-import Data.HashMap.Instances()
 import Data.HashMap.Strict as M
 import Data.ConcreteTypeRep
 import Data.Typeable
@@ -74,8 +73,8 @@ putDyn get' put' v = do
     put' $ DynamicState (M.insert (cTypeOf (undefined :: a)) (Dynamic v) dvs)
 
 instance Binary DynamicState where
-  put (DynamicState ds) = put ds
-  get = DynamicState <$> get
+  put (DynamicState ds) = put (M.toList ds)
+  get = DynamicState . M.fromList <$> get
 
 -- TODO: since a 'DynamicState' is now serialisable, it could potentially
 -- exist for a long time (days/months?). No operations are provided to remove
