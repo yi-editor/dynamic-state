@@ -43,7 +43,7 @@ data Dynamic
 fromDynamic :: forall a. (Typeable a, Binary a) => Dynamic -> Maybe (a,Bool)
 fromDynamic (Dynamic b) = (,False) <$> cast b
 #if __GLASGOW_HASKELL__ < 708
-fromDynamic (Serial bs) = (Just $ decode bs,True)
+fromDynamic (Serial bs) = (,True) <$> (Just $ decode bs)
 #else
 fromDynamic (Serial bs) = let b = either (const Nothing) (\(_,_,a) -> Just a) $ decodeOrFail bs in (,True) <$> b
 #endif
