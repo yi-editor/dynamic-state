@@ -18,8 +18,6 @@
 -- A user-provided State-like is used to store this.
 
 module Data.DynamicState.Serializable (
-  Dynamic(..),
-  fromDynamic,
   DynamicState(..),
   getDyn,
   putDyn
