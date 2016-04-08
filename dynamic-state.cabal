@@ -1,5 +1,5 @@
 name:                dynamic-state
-version:             0.2.1.0
+version:             0.2.2.0
 synopsis:            Optionally serializable dynamic state keyed by type
 description:         Optionally serializable dynamic state keyed by type
 license:             GPL-2
@@ -19,7 +19,7 @@ library
     Data.DynamicState.Serializable
 
   build-depends:
-      base >=4.6 && <4.9
+      base >=4.6 && <5.0
     , binary
     , bytestring
     , unordered-containers

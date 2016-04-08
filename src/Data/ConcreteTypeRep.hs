@@ -97,7 +97,7 @@ instance Hashable ConcreteTypeRep where
 toTyConRep :: TyCon -> TyConRep
 fromTyConRep :: TyConRep -> TyCon
 type TyConRep = (String, String, String)
-toTyConRep (TyCon _ pack mod' name) = (pack, mod', name)
+toTyConRep tc = (tyConPackage tc, tyConModule tc, tyConName tc)
 fromTyConRep (pack, mod', name) = mkTyCon3 pack mod' name
 
 newtype SerialRep = SR (TyConRep, [SerialRep]) deriving(Binary)
