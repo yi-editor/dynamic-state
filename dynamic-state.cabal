@@ -1,5 +1,5 @@
 name:                dynamic-state
-version:             0.2.2.0
+version:             0.3
 synopsis:            Optionally serializable dynamic state keyed by type
 description:         Optionally serializable dynamic state keyed by type
 license:             GPL-2
@@ -11,7 +11,7 @@ build-type:          Simple
 cabal-version:       >=1.10
 
 library
-  ghc-options:      -Wall
+  ghc-options: -Wall -ferror-spans
 
   exposed-modules:
     Data.ConcreteTypeRep

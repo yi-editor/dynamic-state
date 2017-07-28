@@ -28,8 +28,6 @@ import Data.HashMap.Strict as M
 import Data.ConcreteTypeRep
 import Data.Typeable
 import Data.ByteString.Lazy(ByteString)
-import Control.Applicative
-import Data.Monoid
 import Control.Monad
 
 -- | A Dynamic value, potentially stored serialized
