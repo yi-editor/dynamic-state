@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveDataTypeable, GeneralizedNewtypeDeriving, CPP #-}
+{-# LANGUAGE DeriveDataTypeable, GeneralizedNewtypeDeriving, CPP, ViewPatterns #-}
 
 {- |
 Copyright (c)2011, Reiner Pope
@@ -53,19 +53,21 @@ module Data.ConcreteTypeRep (
   fromTypeRep,
  ) where
 
+#if MIN_VERSION_base(4,10,0)
+import Type.Reflection (SomeTypeRep(..))
+import Type.Reflection.Unsafe (mkTyCon, mkTrCon, tyConKindArgs, tyConKindRep, KindRep)
+#endif
 import Data.Typeable
-import Data.Typeable.Internal
-
 import Data.Hashable
 import Data.Binary
-
-import Control.Applicative((<$>))
+import GHC.Fingerprint
 
 -- | Abstract type providing the functionality of 'TypeRep', but additionally supporting hashing and serialization.
 --
 -- The 'Eq' instance is just the 'Eq' instance for 'TypeRep', so an analogous guarantee holds: @'cTypeOf' a == 'cTypeOf' b@ if and only if @a@ and @b@ have the same type.
 -- The hashing and serialization functions preserve this equality.
-newtype ConcreteTypeRep = CTR { unCTR :: TypeRep } deriving(Eq, Typeable)
+newtype ConcreteTypeRep = CTR { unCTR :: TypeRep }
+    deriving (Eq, Typeable)
 
 -- | \"Concrete\" version of 'typeOf'.
 cTypeOf :: Typeable a => a -> ConcreteTypeRep
@@ -83,24 +85,35 @@ fromTypeRep = CTR
 instance Show ConcreteTypeRep where
   showsPrec i = showsPrec i . unCTR
 
-
 -- | This instance is guaranteed to be consistent for a single run of the program, but not for multiple runs.
 instance Hashable ConcreteTypeRep where
-#if MIN_VERSION_base(4,8,0)
-  hashWithSalt salt (CTR (TypeRep (Fingerprint w1 w2) _ _ _)) = salt `hashWithSalt` w1 `hashWithSalt` w2
-#else
-  hashWithSalt salt (CTR (TypeRep (Fingerprint w1 w2) _ _)) = salt `hashWithSalt` w1 `hashWithSalt` w2
-#endif
+    hashWithSalt salt (CTR (typeRepFingerprint -> Fingerprint w1 w2)) = salt `hashWithSalt` w1 `hashWithSalt` w2
 
 ------------- serialization: this uses Gökhan San's construction, from
 ---- http://www.mail-archive.com/haskell-cafe@haskell.org/msg41134.html
+#if MIN_VERSION_base(4,10,0)
+type TyConRep = (String, String, String, Int, KindRep)
+#else
+type TyConRep = (String, String, String)
+#endif
+
 toTyConRep :: TyCon -> TyConRep
 fromTyConRep :: TyConRep -> TyCon
-type TyConRep = (String, String, String)
-toTyConRep tc = (tyConPackage tc, tyConModule tc, tyConName tc)
-fromTyConRep (pack, mod', name) = mkTyCon3 pack mod' name
 
-newtype SerialRep = SR (TyConRep, [SerialRep]) deriving(Binary)
+#if MIN_VERSION_base(4,10,0)
+toTyConRep tc = (tyConPackage tc, tyConModule tc, tyConName tc, tyConKindArgs tc, tyConKindRep tc)
+#else
+toTyConRep tc = (tyConPackage tc, tyConModule tc, tyConName tc)
+#endif
+
+#if MIN_VERSION_base(4,10,0)
+fromTyConRep (pack, mod', name, ka, kr) = mkTyCon pack mod' name ka kr
+#else
+fromTyConRep (pack, mod', name) = mkTyCon3 pack mod' name
+#endif
+
+newtype SerialRep = SR (TyConRep, [SerialRep])
+    deriving (Binary)
 
 toSerial :: ConcreteTypeRep -> SerialRep
 toSerial (CTR t) =
@@ -108,7 +121,11 @@ toSerial (CTR t) =
     (con, args) -> SR (toTyConRep con, map (toSerial . CTR) args)
 
 fromSerial :: SerialRep -> ConcreteTypeRep
+#if MIN_VERSION_base(4,10,0)
+fromSerial (SR (con, args)) = CTR . SomeTypeRep $ mkTrCon (fromTyConRep con) (map (unCTR . fromSerial) args)
+#else
 fromSerial (SR (con, args)) = CTR $ mkTyConApp (fromTyConRep con) (map (unCTR . fromSerial) args)
+#endif
 
 instance Binary ConcreteTypeRep where
   put = put . toSerial

@@ -21,8 +21,6 @@ module Data.DynamicState (
 import Data.Dynamic
 import Data.HashMap.Strict as M
 import Data.ConcreteTypeRep
-import Data.Monoid
-import Control.Applicative
 
 -- | An extensible record, indexed by type
 newtype DynamicState = DynamicState { unDynamicState :: M.HashMap ConcreteTypeRep Dynamic }
