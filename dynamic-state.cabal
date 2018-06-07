@@ -1,5 +1,5 @@
 name:                dynamic-state
-version:             0.3
+version:             0.3.1
 synopsis:            Optionally serializable dynamic state keyed by type
 description:         Optionally serializable dynamic state keyed by type
 license:             GPL-2
