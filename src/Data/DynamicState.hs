@@ -1,5 +1,6 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE DeriveDataTypeable #-}
+{-# LANGUAGE CPP #-}
 {-# OPTIONS_HADDOCK show-extensions #-}
 
 -- |
@@ -25,6 +26,11 @@ import Data.ConcreteTypeRep
 -- | An extensible record, indexed by type
 newtype DynamicState = DynamicState { unDynamicState :: M.HashMap ConcreteTypeRep Dynamic }
   deriving (Typeable)
+
+#if __GLASGOW_HASKELL__ >= 804
+instance Semigroup DynamicState where
+  (<>) = mappend
+#endif
 
 instance Monoid DynamicState where
   mappend (DynamicState a) (DynamicState b) = DynamicState (mappend a b)

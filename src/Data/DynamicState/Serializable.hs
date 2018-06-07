@@ -54,6 +54,11 @@ instance Binary Dynamic where
 newtype DynamicState = DynamicState { unDynamicState :: M.HashMap ConcreteTypeRep Dynamic }
   deriving (Typeable)
 
+#if __GLASGOW_HASKELL__ >= 804
+instance Semigroup DynamicState where
+  (<>) = mappend
+#endif
+
 instance Monoid DynamicState where
   mappend (DynamicState a) (DynamicState b) = DynamicState (mappend a b)
   mempty = DynamicState mempty
