@@ -56,11 +56,13 @@ newtype DynamicState = DynamicState { unDynamicState :: M.HashMap ConcreteTypeRe
 
 #if __GLASGOW_HASKELL__ >= 804
 instance Semigroup DynamicState where
-  (<>) = mappend
+  DynamicState a <> DynamicState b = DynamicState (a <> b)
 #endif
 
 instance Monoid DynamicState where
+#if !MIN_VERSION_base(4,11,0)
   mappend (DynamicState a) (DynamicState b) = DynamicState (mappend a b)
+#endif
   mempty = DynamicState mempty
 
 -- | Get a value, inside a State-like monad specified by the first two functions
